@@ -7,7 +7,7 @@ interface EditLinkModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (link: LinkItem) => void;
-  linkToEdit: LinkItem | null;
+  linkToEdit: LinkItem | Partial<LinkItem> | null;
   dictionaries: Dictionaries;
   allLinks: LinkItem[];
 }
@@ -159,14 +159,14 @@ const AttachmentsManager: React.FC<{
 
 const EditLinkModal: React.FC<EditLinkModalProps> = ({ isOpen, onClose, onSave, linkToEdit, dictionaries, allLinks }) => {
   const getInitialState = () => ({
-    url: '',
-    title: '',
-    description: '',
-    topic: dictionaries.topics[0]?.value || '',
-    priority: dictionaries.priorities[0]?.value || '',
-    status: dictionaries.statuses[0]?.value || '',
-    relatedLinkIds: [],
-    attachments: [],
+    url: linkToEdit?.url || '',
+    title: linkToEdit?.title || '',
+    description: linkToEdit?.description || '',
+    topic: linkToEdit?.topic || dictionaries.topics[0]?.value || '',
+    priority: linkToEdit?.priority || dictionaries.priorities[0]?.value || '',
+    status: linkToEdit?.status || dictionaries.statuses[0]?.value || '',
+    relatedLinkIds: linkToEdit?.relatedLinkIds || [],
+    attachments: linkToEdit?.attachments || [],
   });
 
   const [linkData, setLinkData] = useState<Omit<LinkItem, 'id' | 'createdAt' | 'attachmentText'>>(getInitialState());
@@ -176,8 +176,14 @@ const EditLinkModal: React.FC<EditLinkModalProps> = ({ isOpen, onClose, onSave, 
   useEffect(() => {
     if (isOpen) {
       if (linkToEdit) {
+        // Merge partial or full linkToEdit with defaults
         setLinkData({
-          ...linkToEdit,
+          url: linkToEdit.url || '',
+          title: linkToEdit.title || '',
+          description: linkToEdit.description || '',
+          topic: linkToEdit.topic || dictionaries.topics[0]?.value || '',
+          priority: linkToEdit.priority || dictionaries.priorities[0]?.value || '',
+          status: linkToEdit.status || dictionaries.statuses[0]?.value || '',
           relatedLinkIds: linkToEdit.relatedLinkIds || [],
           attachments: linkToEdit.attachments || [],
         });
@@ -250,7 +256,7 @@ const EditLinkModal: React.FC<EditLinkModalProps> = ({ isOpen, onClose, onSave, 
     <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl border border-gray-200 dark:border-gray-700 max-h-[90vh] flex flex-col">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{linkToEdit ? 'Edit Resource' : 'Add New Resource'}</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{linkToEdit && 'id' in linkToEdit ? 'Edit Resource' : 'Add New Resource'}</h2>
         </div>
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto">
           <div className="p-6">

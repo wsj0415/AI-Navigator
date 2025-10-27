@@ -33,9 +33,23 @@ const App: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
   
-  const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
+  const [editingLink, setEditingLink] = useState<LinkItem | Partial<LinkItem> | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLinkIds, setSelectedLinkIds] = useState<string[]>([]);
+  
+  useEffect(() => {
+    if (!isInitialized) return;
+    // Check for URL parameter to pre-fill the "add new" modal
+    const params = new URLSearchParams(window.location.search);
+    const urlToAdd = params.get('addUrl');
+    if (urlToAdd) {
+      // Use a partial LinkItem to pre-fill the URL
+      setEditingLink({ url: urlToAdd });
+      setIsModalOpen(true);
+      // Clean up the URL to avoid re-triggering on refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [isInitialized]);
 
   const handleTopicToggle = (topicValue: string) => {
     if (topicValue === 'all') {

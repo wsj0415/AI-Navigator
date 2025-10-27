@@ -14,21 +14,12 @@ This document outlines the planned features and improvements for the AI Navigato
 - **Core: Relational Linking:** Connect related resources together.
 - **Core: File Attachments:** Attach files directly to resources.
 - **UI: Advanced Filtering:** Implemented combined filtering capabilities.
-  - [x] Add filter dropdowns for Status and Priority in the header.
-  - [x] Allow selecting multiple Categories/Tags to filter by.
-
-## 🚀 High Priority / Next Up
-
-- [ ] **Feature: Full-text search in attachments:** For supported file types (txt, pdf), allow searching within the content of attached files.
+- **UI: Theme Toggle:** Add a light/dark mode switcher.
+- **Technical: Migrate to IndexedDB:** Moved from localStorage to IndexedDB for more robust, scalable storage.
+- **Feature: Full-text search in attachments:** For supported file types (e.g., .txt), the content is indexed and searchable.
+- **UI: Onboarding / Walkthrough:** A simple guide for first-time users is now included.
+- **Feature: Browser Extension:** Created a simple browser extension to quickly add the current page to AI Navigator.
 
 ## 💡 Future Ideas
 
-### UI Enhancements
- - [x] **UI: Theme Toggle:** Add a light/dark mode switcher.
- - [ ] **UI: Onboarding / Walkthrough:** Add a simple guide for first-time users.
-
-### New Features
- - [ ] **Feature: Browser Extension:** Create a simple browser extension to quickly add the current page to AI Navigator.
-
-### Technical Improvements
- - [ ] **Technical: Migrate to IndexedDB:** For more robust storage of larger data (especially attachments), move from localStorage to IndexedDB.
+*This section can be populated with new ideas as they arise.*

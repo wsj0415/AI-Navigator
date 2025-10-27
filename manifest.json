@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "AI Navigator Clipper",
+  "version": "1.0",
+  "description": "Quickly add the current page to your AI Navigator knowledge base.",
+  "permissions": [
+    "activeTab"
+  ],
+  "action": {
+    "default_title": "Add to AI Navigator"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
