@@ -55,7 +55,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
               <LogoIcon className="w-6 h-6" />
               <span className="font-bold text-xl text-gray-900 dark:text-white">AI Navigator</span>
             </div>
-            <nav className="hidden md:flex items-center gap-2">
+            <nav id="nav-main-tabs" className="hidden md:flex items-center gap-2">
               <NavButton targetPage="dashboard">Dashboard</NavButton>
               <NavButton targetPage="resources">Resources</NavButton>
               <NavButton targetPage="settings">Settings</NavButton>
@@ -64,7 +64,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
 
           <div className="flex items-center gap-4">
             {page === 'resources' && (
-              <div className="relative hidden sm:block">
+              <div id="nav-search" className="relative hidden sm:block">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                   <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-400" />
                 </span>
@@ -90,6 +90,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
                 <DownloadIcon className="w-5 h-5" />
               </button>
               <button
+                id="nav-add-new"
                 onClick={onAddNew}
                 className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-semibold py-2 px-4 rounded-md transition duration-200 text-sm"
               >

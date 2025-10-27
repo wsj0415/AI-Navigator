@@ -63,19 +63,38 @@ const AttachmentsManager: React.FC<{
     const handleFileChange = (files: FileList | null) => {
         if (!files) return;
         
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const newAttachment: Attachment = {
-                    id: crypto.randomUUID(),
-                    name: file.name,
-                    type: file.type,
-                    size: file.size,
-                    dataUrl: e.target?.result as string,
+        const filePromises = Array.from(files).map(file => {
+            return new Promise<Attachment>((resolve) => {
+                const dataUrlReader = new FileReader();
+                dataUrlReader.onload = (e) => {
+                    const attachmentStub: Omit<Attachment, 'dataUrl'> = {
+                        id: crypto.randomUUID(),
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                    };
+                    const dataUrl = e.target?.result as string;
+
+                    if (file.type === 'text/plain') {
+                        const textReader = new FileReader();
+                        textReader.onload = (textEvent) => {
+                            resolve({
+                                ...attachmentStub,
+                                dataUrl,
+                                textContent: textEvent.target?.result as string,
+                            });
+                        };
+                        textReader.readAsText(file);
+                    } else {
+                        resolve({ ...attachmentStub, dataUrl });
+                    }
                 };
-                onAttachmentsChange([...attachments, newAttachment]);
-            };
-            reader.readAsDataURL(file);
+                dataUrlReader.readAsDataURL(file);
+            });
+        });
+
+        Promise.all(filePromises).then(newAttachments => {
+            onAttachmentsChange([...attachments, ...newAttachments]);
         });
     };
 
@@ -97,7 +116,7 @@ const AttachmentsManager: React.FC<{
             handleFileChange(e.dataTransfer.files);
             e.dataTransfer.clearData();
         }
-    }, [onAttachmentsChange, attachments, handleFileChange]);
+    }, [onAttachmentsChange, attachments]);
 
     const removeAttachment = (id: string) => {
         onAttachmentsChange(attachments.filter(att => att.id !== id));
@@ -150,7 +169,7 @@ const EditLinkModal: React.FC<EditLinkModalProps> = ({ isOpen, onClose, onSave, 
     attachments: [],
   });
 
-  const [linkData, setLinkData] = useState<Omit<LinkItem, 'id' | 'createdAt'>>(getInitialState());
+  const [linkData, setLinkData] = useState<Omit<LinkItem, 'id' | 'createdAt' | 'attachmentText'>>(getInitialState());
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [error, setError] = useState('');
 
@@ -209,10 +228,17 @@ const EditLinkModal: React.FC<EditLinkModalProps> = ({ isOpen, onClose, onSave, 
         setError('URL and Title are required.');
         return;
     }
+    
+    const aggregatedAttachmentText = linkData.attachments
+        .map(att => att.textContent)
+        .filter(Boolean)
+        .join('\n\n');
+
     const finalLink: LinkItem = {
       id: linkToEdit?.id || crypto.randomUUID(),
       createdAt: linkToEdit?.createdAt || new Date().toISOString(),
       ...linkData,
+      attachmentText: aggregatedAttachmentText,
     };
     onSave(finalLink);
     onClose();

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Page, LinkItem, Dictionaries, ViewType, SortOption } from './types';
 import useLocalStorage from './hooks/useLocalStorage';
-import { INITIAL_LINKS, INITIAL_DICTIONARIES } from './constants';
+import { useAppStorage } from './hooks/useAppStorage';
 import { parseCSV, exportCSV } from './utils/csvHelper';
 import TopNavBar from './components/TopNavBar';
 import Sidebar from './components/Sidebar';
@@ -12,11 +12,12 @@ import EditLinkModal from './components/EditLinkModal';
 import SettingsPage from './components/SettingsPage';
 import Dashboard from './components/Dashboard';
 import BatchActionsToolbar from './components/BatchActionsToolbar';
+import OnboardingGuide from './components/OnboardingGuide';
 
 const App: React.FC = () => {
-  const [links, setLinks] = useLocalStorage<LinkItem[]>('links', INITIAL_LINKS);
-  const [dictionaries, setDictionaries] = useLocalStorage<Dictionaries>('dictionaries', INITIAL_DICTIONARIES);
+  const { isInitialized, links, setLinks, dictionaries, setDictionaries } = useAppStorage();
   const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'dark');
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useLocalStorage('onboarding-completed', false);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -54,10 +55,12 @@ const App: React.FC = () => {
         const topicMatch = selectedTopics.length === 0 || selectedTopics.includes(link.topic);
         const statusMatch = selectedStatus === 'all' || link.status === selectedStatus;
         const priorityMatch = selectedPriority === 'all' || link.priority === selectedPriority;
+        const searchTermLower = searchTerm.toLowerCase();
         const searchMatch = !searchTerm ||
-          link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          link.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          link.url.toLowerCase().includes(searchTerm.toLowerCase());
+          link.title.toLowerCase().includes(searchTermLower) ||
+          link.description.toLowerCase().includes(searchTermLower) ||
+          link.url.toLowerCase().includes(searchTermLower) ||
+          (link.attachmentText && link.attachmentText.toLowerCase().includes(searchTermLower));
         return topicMatch && searchMatch && statusMatch && priorityMatch;
       });
   }, [links, selectedTopics, searchTerm, selectedStatus, selectedPriority]);
@@ -76,19 +79,19 @@ const App: React.FC = () => {
     return sorted;
   }, [filteredLinks, sortOption, dictionaries.priorities]);
 
-  const handleSaveLink = (link: LinkItem) => {
+  const handleSaveLink = async (link: LinkItem) => {
     const index = links.findIndex(l => l.id === link.id);
     if (index > -1) {
-      setLinks(prev => prev.map(l => l.id === link.id ? link : l));
+      await setLinks(prev => prev.map(l => l.id === link.id ? link : l));
     } else {
-      setLinks(prev => [link, ...prev]);
+      await setLinks(prev => [link, ...prev]);
     }
   };
 
-  const handleDeleteLink = (id: string) => {
+  const handleDeleteLink = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       // Also remove this id from any other links that relate to it
-      setLinks(prev => {
+      await setLinks(prev => {
         const updated = prev.filter(l => l.id !== id);
         return updated.map(l => ({
           ...l,
@@ -123,11 +126,11 @@ const App: React.FC = () => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const text = e.target?.result as string;
         const newLinks = parseCSV(text);
         if (newLinks.length > 0) {
-            setLinks(prev => [...prev, ...newLinks.filter(nl => !prev.some(pl => pl.id === nl.id))]);
+            await setLinks(prev => [...prev, ...newLinks.filter(nl => !prev.some(pl => pl.id === nl.id))]);
             alert(`${newLinks.length} items imported successfully!`);
         } else {
             alert('Could not import any items. Please check the CSV format.');
@@ -154,8 +157,8 @@ const App: React.FC = () => {
     }
   };
   
-  const handleBatchUpdate = (update: { status?: string; priority?: string }) => {
-    setLinks(prev => prev.map(link => 
+  const handleBatchUpdate = async (update: { status?: string; priority?: string }) => {
+    await setLinks(prev => prev.map(link => 
         selectedLinkIds.includes(link.id) ? { ...link, ...update } : link
     ));
     setSelectedLinkIds([]);
@@ -217,8 +220,19 @@ const App: React.FC = () => {
     );
   }
 
+  if (!isInitialized) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-950">
+        <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">Loading Resources...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
+      {!hasCompletedOnboarding && isInitialized && (
+        <OnboardingGuide onComplete={() => setHasCompletedOnboarding(true)} />
+      )}
       <TopNavBar
         page={page}
         onPageChange={setPage}

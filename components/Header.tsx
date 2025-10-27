@@ -49,7 +49,7 @@ const Header: React.FC<HeaderProps> = ({
         </h2>
       </div>
 
-      <div className="flex items-center flex-wrap gap-4">
+      <div id="header-filters" className="flex items-center flex-wrap gap-4">
         <div className="flex items-center gap-2">
             <select
                 value={selectedStatus}
