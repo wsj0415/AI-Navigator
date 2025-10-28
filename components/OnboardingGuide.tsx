@@ -10,7 +10,7 @@ type OnboardingStep = {
 const steps: OnboardingStep[] = [
   {
     targetId: 'nav-add-new',
-    title: 'Welcome to AI Navigator!',
+    title: 'Welcome to AI Nexus!',
     content: 'This is your intelligent knowledge base. Click here to add your first resource.',
     position: 'bottom',
   },
@@ -21,15 +21,15 @@ const steps: OnboardingStep[] = [
     position: 'bottom',
   },
   {
-    targetId: 'header-filters',
-    title: 'Filter & Sort',
-    content: 'Refine your view with powerful sorting and filtering options to organize your resources just the way you like.',
-    position: 'bottom',
+    targetId: 'filter-panel',
+    title: 'Advanced Filtering',
+    content: 'Refine your view with multi-select filters for categories, priorities, and statuses to find exactly what you need.',
+    position: 'right',
   },
     {
     targetId: 'nav-main-tabs',
     title: 'Switch Pages',
-    content: 'Navigate between your Dashboard for insights, this Resources view, and the Settings page to customize categories.',
+    content: 'Navigate between your Dashboard for insights, this Resources view, and the Settings page to customize your app.',
     position: 'bottom',
   },
 ];
@@ -49,12 +49,20 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
       const targetElement = document.getElementById(step.targetId);
       if (targetElement) {
         setTargetRect(targetElement.getBoundingClientRect());
+      } else {
+        // If element not found, maybe skip or wait? For now, we'll just not show the tooltip.
+        setTargetRect(null);
       }
     };
     
-    updatePosition();
+    // Give a small delay for elements to render
+    const timer = setTimeout(updatePosition, 100);
     window.addEventListener('resize', updatePosition);
-    return () => window.removeEventListener('resize', updatePosition);
+    
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', updatePosition);
+    };
   }, [currentStep, step.targetId]);
 
 
@@ -71,7 +79,7 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
   };
 
   const getTooltipPosition = () => {
-    if (!targetRect) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+    if (!targetRect) return { top: '-9999px', left: '-9999px' }; // Hide if no target
     const offset = 12; // 12px gap
     switch(step.position) {
         case 'top':
@@ -90,11 +98,10 @@ const OnboardingGuide: React.FC<OnboardingGuideProps> = ({ onComplete }) => {
   return (
     <div className="fixed inset-0 z-[100]">
        <div 
-        className="fixed inset-0"
+        className="fixed inset-0 transition-all duration-300 ease-out"
         style={{
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            clipPath: targetRect ? `path(evenodd, "M0 0 H ${window.innerWidth} V ${window.innerHeight} H 0 Z M ${targetRect.x - 4} ${targetRect.y - 4} H ${targetRect.x + targetRect.width + 4} V ${targetRect.y + targetRect.height + 4} H ${targetRect.x - 4} Z")` : 'none',
-            transition: 'clip-path 0.3s ease-out'
+            clipPath: targetRect ? `path(evenodd, "M0 0 H ${window.innerWidth} V ${window.innerHeight} H 0 Z M ${targetRect.x - 4} ${targetRect.y - 4} H ${targetRect.x + targetRect.width + 4} V ${targetRect.y + targetRect.height + 4} H ${targetRect.x - 4} Z")` : 'path("M0 0 H 0 V 0 H 0 Z")',
         }}
        ></div>
       

@@ -49,7 +49,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2 text-primary">
               <LogoIcon className="w-6 h-6" />
-              <span className="font-bold text-xl text-gray-900 dark:text-white">AI Navigator</span>
+              <span className="font-bold text-xl text-gray-900 dark:text-white">AI Nexus</span>
             </div>
             <nav id="nav-main-tabs" className="hidden md:flex items-center gap-2">
               <NavButton targetPage="dashboard">Dashboard</NavButton>

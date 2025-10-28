@@ -1,6 +1,6 @@
-# AI Navigator
+# AI Nexus
 
-An intelligent web application to manage, classify, and analyze your AI-related web links and resources. AI Navigator uses the Gemini API to automatically extract metadata, making it effortless to build your personal knowledge base.
+An intelligent web application to manage, classify, and analyze your AI-related web links and resources. AI Nexus uses the Gemini API to automatically extract metadata, making it effortless to build your personal knowledge base.
 
 ## ✨ Key Features
 

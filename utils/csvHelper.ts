@@ -1,57 +1,85 @@
-import { LinkItem } from '../types';
+import { LinkItem, Dictionaries } from '../types';
 
-// Note: File attachments are NOT included in the CSV export due to their size and complexity.
-// Use a different format like JSON for full data backup.
-
-export const exportCSV = (links: LinkItem[]) => {
-  const header = ['id', 'url', 'title', 'description', 'topic', 'priority', 'status', 'createdAt', 'relatedLinkIds', 'attachments'];
-  const rows = links.map(link =>
-    header.map(fieldName => {
-        const key = fieldName as keyof LinkItem;
-        const value = link[key];
-        if (key === 'relatedLinkIds' && Array.isArray(value)) {
-            return JSON.stringify(value.join(';'));
-        }
-        if (key === 'attachments') { // Don't export attachment data in CSV
-            return JSON.stringify(Array.isArray(value) ? value.length : 0);
-        }
-        return JSON.stringify(value)
-    }).join(',')
-  );
-  return [header.join(','), ...rows].join('\n');
+const toCsv = (headers: string[], data: any[][]): string => {
+    const headerRow = headers.join(',') + '\n';
+    const dataRows = data.map(row => 
+        row.map(cell => {
+            const str = String(cell ?? '');
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        }).join(',')
+    ).join('\n');
+    return headerRow + dataRows;
 };
 
-
-export const parseCSV = (csvText: string): LinkItem[] => {
-    const lines = csvText.split('\n');
-    if (lines.length < 2) return [];
+export const exportLinksToCsv = (links: LinkItem[], dictionaries: Dictionaries): void => {
+    const headers = ['id', 'url', 'title', 'description', 'topic', 'priority', 'status', 'createdAt', 'notes'];
     
-    const header = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-    const links: LinkItem[] = [];
+    const getLabelFromCode = (dict: keyof Dictionaries, code: string) => {
+        return dictionaries[dict].find(item => item.code === code)?.label || code;
+    };
 
-    for (let i = 1; i < lines.length; i++) {
-        if (!lines[i]) continue;
-        const values = lines[i].split(',');
-        const linkObject: any = {};
-        
-        for (let j = 0; j < header.length; j++) {
-            let value = values[j] || '';
-            // Handle values that might be quoted
-            if (value.startsWith('"') && value.endsWith('"')) {
-                value = value.substring(1, value.length - 1);
-            }
+    const data = links.map(link => [
+        link.id,
+        link.url,
+        link.title,
+        link.description,
+        getLabelFromCode('topics', link.topic),
+        getLabelFromCode('priorities', link.priority),
+        getLabelFromCode('statuses', link.status),
+        link.createdAt,
+        link.notes || '',
+    ]);
 
-            if (header[j] === 'relatedLinkIds') {
-              linkObject[header[j]] = value ? value.trim().split(';') : [];
-            } else if (header[j] === 'attachments') {
-               linkObject[header[j]] = []; // Don't import attachment data from CSV
-            } else {
-              linkObject[header[j]] = value.trim();
-            }
+    const csvContent = toCsv(headers, data);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `ai-nexus-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+export const importLinksFromCsv = (csvText: string, dictionaries: Dictionaries): Promise<LinkItem[]> => {
+    return new Promise((resolve, reject) => {
+        try {
+            const lines = csvText.split(/\r\n|\n/).filter(line => line.trim() !== '');
+            if (lines.length < 2) return resolve([]);
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = lines.slice(1);
+            
+            const getCodeFromLabel = (dict: keyof Dictionaries, label: string) => {
+                return dictionaries[dict].find(item => item.label.toLowerCase() === label.toLowerCase())?.code || dictionaries[dict][dictionaries[dict].length-1].code;
+            };
+
+            const links: LinkItem[] = data.map(row => {
+                const values = row.split(',');
+                const linkObject: { [key: string]: string } = {};
+                headers.forEach((header, i) => {
+                    linkObject[header] = values[i];
+                });
+
+                return {
+                    id: linkObject.id || crypto.randomUUID(),
+                    url: linkObject.url,
+                    title: linkObject.title,
+                    description: linkObject.description || '',
+                    topic: getCodeFromLabel('topics', linkObject.topic || 'Other'),
+                    priority: getCodeFromLabel('priorities', linkObject.priority || 'Low'),
+                    status: getCodeFromLabel('statuses', linkObject.status || 'To Read'),
+                    createdAt: linkObject.createdAt || new Date().toISOString(),
+                    notes: linkObject.notes || '',
+                };
+            });
+
+            resolve(links.filter(l => l.url && l.title));
+        } catch (error) {
+            reject(error);
         }
-        if (linkObject.id && linkObject.url && linkObject.title) {
-          links.push({ attachments: [], ...linkObject } as LinkItem);
-        }
-    }
-    return links;
+    });
 };

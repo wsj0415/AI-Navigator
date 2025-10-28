@@ -1,5 +1,5 @@
 import React from 'react';
-import { ViewType, SortOption, Dictionaries } from '../types';
+import { ViewType, SortOption } from '../types';
 import { ListIcon, GalleryIcon } from './Icons';
 
 interface HeaderProps {
@@ -8,11 +8,6 @@ interface HeaderProps {
   sortOption: SortOption;
   onSortChange: (option: SortOption) => void;
   itemCount: number;
-  dictionaries: Dictionaries;
-  selectedStatus: string;
-  onStatusChange: (status: string) => void;
-  selectedPriority: string;
-  onPriorityChange: (priority: string) => void;
 }
 
 const SortButton: React.FC<{
@@ -37,38 +32,17 @@ const SortButton: React.FC<{
 const Header: React.FC<HeaderProps> = ({ 
     view, onViewChange, 
     sortOption, onSortChange, 
-    itemCount, dictionaries, 
-    selectedStatus, onStatusChange, 
-    selectedPriority, onPriorityChange 
+    itemCount
 }) => {
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-2">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Resources <span className="text-gray-500 dark:text-gray-400 font-normal text-base">({itemCount})</span>
+          All Resources <span className="text-gray-500 dark:text-gray-400 font-normal text-base">({itemCount})</span>
         </h2>
       </div>
 
-      <div id="header-filters" className="flex items-center flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-            <select
-                value={selectedStatus}
-                onChange={(e) => onStatusChange(e.target.value)}
-                className="form-input text-sm"
-            >
-                <option value="all">All Statuses</option>
-                {dictionaries.statuses.map(opt => <option key={opt.id} value={opt.value}>{opt.value}</option>)}
-            </select>
-            <select
-                value={selectedPriority}
-                onChange={(e) => onPriorityChange(e.target.value)}
-                className="form-input text-sm"
-            >
-                <option value="all">All Priorities</option>
-                {dictionaries.priorities.map(opt => <option key={opt.id} value={opt.value}>{opt.value}</option>)}
-            </select>
-        </div>
-
+      <div className="flex items-center flex-wrap gap-4">
         <div className="flex items-center bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-1 gap-1">
           <SortButton currentSort={sortOption} targetSort="default" onSortChange={onSortChange}>Default</SortButton>
           <SortButton currentSort={sortOption} targetSort="priority" onSortChange={onSortChange}>By Priority</SortButton>
@@ -92,7 +66,6 @@ const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       </div>
-       <style>{`.form-input { display: block; border-radius: 0.375rem; border: 1px solid #d1d5db; background-color: #f3f4f6; padding: 0.5rem 0.75rem; color: #1f2937; appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; } .dark .form-input { border-color: #444; background-color: #2d2d2d; color: #e0e0e0; } .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); }`}</style>
     </div>
   );
 };

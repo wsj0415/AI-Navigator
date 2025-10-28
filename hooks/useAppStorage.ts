@@ -12,13 +12,56 @@ export function useAppStorage() {
         const loadData = async () => {
             try {
                 await db.initDB();
-                const [dbLinks, dbDicts] = await Promise.all([
+                let [dbLinks, dbDicts] = await Promise.all([
                     db.getAllLinks(),
                     db.getDictionaries()
                 ]);
                 
-                setLinks(dbLinks || []);
-                setDictionaries(dbDicts || INITIAL_DICTIONARIES);
+                // Check if the old format { value: '...' } exists, indicating migration is needed.
+                const dictionariesNeedMigration = dbDicts && dbDicts.topics.length > 0 && (dbDicts.topics[0] as any).value !== undefined;
+
+                if (dictionariesNeedMigration) {
+                    console.log("Running data migration for dictionaries and links...");
+                    
+                    const valueToCodeMaps = { topics: new Map(), priorities: new Map(), statuses: new Map() };
+                    
+                    const migrateDict = (items: any[], map: Map<string, string>) => items.map((item, index) => {
+                        const code = item.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                        map.set(item.value, code);
+                        return {
+                            id: item.id,
+                            code: code,
+                            label: item.value,
+                            sortOrder: index,
+                            isEnabled: true,
+                        };
+                    });
+
+                    const newTopics = migrateDict(dbDicts.topics, valueToCodeMaps.topics);
+                    const newPriorities = migrateDict(dbDicts.priorities, valueToCodeMaps.priorities);
+                    const newStatuses = migrateDict(dbDicts.statuses, valueToCodeMaps.statuses);
+                    
+                    const migratedDicts = { topics: newTopics, priorities: newPriorities, statuses: newStatuses };
+                    
+                    const migratedLinks = dbLinks.map(link => ({
+                        ...link,
+                        topic: valueToCodeMaps.topics.get(link.topic) || 'other',
+                        priority: valueToCodeMaps.priorities.get(link.priority) || 'low',
+                        status: valueToCodeMaps.statuses.get(link.status) || 'to-read',
+                    }));
+
+                    await Promise.all([
+                        db.putDictionaries(migratedDicts),
+                        db.clearAndBulkPutLinks(migratedLinks)
+                    ]);
+                    
+                    setLinks(migratedLinks);
+                    setDictionaries(migratedDicts);
+
+                } else {
+                    setLinks(dbLinks || []);
+                    setDictionaries(dbDicts || INITIAL_DICTIONARIES);
+                }
 
             } catch (error) {
                 console.error("Failed to initialize DB:", error);

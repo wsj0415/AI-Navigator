@@ -21,6 +21,9 @@ const BatchActionsToolbar: React.FC<BatchActionsToolbarProps> = ({ selectedCount
       onUpdate(update);
     }
   };
+  
+  const visibleStatuses = dictionaries.statuses.filter(s => s.isEnabled).sort((a,b) => a.sortOrder - b.sortOrder);
+  const visiblePriorities = dictionaries.priorities.filter(p => p.isEnabled).sort((a,b) => a.sortOrder - b.sortOrder);
 
   return (
     <div className="my-4 p-3 bg-blue-50 dark:bg-gray-700 rounded-lg flex flex-wrap items-center justify-between gap-4 border border-blue-200 dark:border-blue-500/50">
@@ -29,12 +32,12 @@ const BatchActionsToolbar: React.FC<BatchActionsToolbarProps> = ({ selectedCount
         
         <select value={newStatus} onChange={e => setNewStatus(e.target.value)} className="form-input text-sm">
             <option value="">Change Status</option>
-            {dictionaries.statuses.map(opt => <option key={opt.id} value={opt.value}>{opt.value}</option>)}
+            {visibleStatuses.map(opt => <option key={opt.id} value={opt.code}>{opt.label}</option>)}
         </select>
         
         <select value={newPriority} onChange={e => setNewPriority(e.target.value)} className="form-input text-sm">
             <option value="">Change Priority</option>
-            {dictionaries.priorities.map(opt => <option key={opt.id} value={opt.value}>{opt.value}</option>)}
+            {visiblePriorities.map(opt => <option key={opt.id} value={opt.code}>{opt.label}</option>)}
         </select>
         
         <button onClick={handleApply} className="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-1 px-3 rounded-md text-sm transition">

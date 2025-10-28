@@ -24,21 +24,25 @@ const Dashboard: React.FC<DashboardProps> = ({ links, dictionaries }) => {
   const totalLinks = links.length;
 
   const linksByStatus = dictionaries.statuses.map(status => ({
-    name: status.value,
-    count: links.filter(link => link.status === status.value).length,
+    name: status.label,
+    count: links.filter(link => link.status === status.code).length,
   }));
   
   const linksByPriority = dictionaries.priorities.map(priority => ({
-    name: priority.value,
-    count: links.filter(link => link.priority === priority.value).length,
+    name: priority.label,
+    code: priority.code,
+    count: links.filter(link => link.priority === priority.code).length,
   }));
 
   const linksByTopic = dictionaries.topics.map(topic => ({
-    name: topic.value,
-    count: links.filter(link => link.topic === topic.value).length,
+    name: topic.label,
+    count: links.filter(link => link.topic === topic.code).length,
   }));
 
   const mostRecentLink = links.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+
+  const highPriorityItem = linksByPriority.find(p => p.code === 'high');
+  const toReadItem = linksByStatus.find(s => s.name === 'To Read');
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -50,10 +54,10 @@ const Dashboard: React.FC<DashboardProps> = ({ links, dictionaries }) => {
           <StatCard title="Most Common Topic" value={linksByTopic.sort((a,b) => b.count - a.count)[0]?.name || 'N/A'}>
              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 8v5z" /></svg>
           </StatCard>
-          <StatCard title="Highest Priority Items" value={linksByPriority.find(p => p.name === 'High')?.count || 0}>
+          <StatCard title="Highest Priority Items" value={highPriorityItem?.count || 0}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </StatCard>
-          <StatCard title="Items To Read" value={linksByStatus.find(p => p.name === 'To Read')?.count || 0}>
+          <StatCard title="Items To Read" value={toReadItem?.count || 0}>
              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
           </StatCard>
         </div>

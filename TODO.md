@@ -1,100 +1,69 @@
-# AI Navigator - TODO & Roadmap
+# AI Nexus Roadmap
 
-This document outlines the planned features and improvements for the AI Navigator application.
+This file tracks the development roadmap for the AI Nexus application.
 
----
+## 🚀 Project Nexus (UI/UX Overhaul) - ✅ COMPLETE
 
-### 🟥 P0: High Priority - Foundational Enhancements
-
-*These items are prerequisites for many upcoming features and address core architecture.*
-
--   **[ ] Architecture: Refactor Data Dictionaries**
-    -   **Goal:** Transition from the current simple `DictionaryItem` (`{id, value}`) to a more robust, professional model based on best practices.
-    -   **Implementation:**
-        -   Update the `DictionaryItem` interface in `types.ts` to include `code` (for stable internal reference), `value` (for display), `sortOrder`, and `isEnabled`.
-        -   Refactor the Settings page to provide a full management UI for each dictionary type (Categories, Priorities, Statuses).
-        -   Update all components that use dictionaries to work with the new data structure.
-
--   **[ ] UI/UX: Enhance Theme Settings**
-    -   **Goal:** Provide a more intelligent and flexible theme experience.
-    -   **Implementation:**
-        -   On application startup, automatically detect and apply the user's operating system theme (light/dark).
-        -   Provide a three-way toggle in the UI: "Light", "Dark", and "Follow System".
-        -   Persist the user's explicit choice in local storage.
-
--   **[ ] Data Model: Extend Resource Properties**
-    -   **Goal:** Add new fields to the `LinkItem` data model to support upcoming visual features.
-    -   **Implementation:**
-        -   Add an optional `faviconUrl: string` field to store the website's icon (as a Base64 Data URL).
-        -   Add an optional `coverImageUrl: string` field to store a page screenshot (as a Base64 Data URL).
-
----
-
-### 🟧 P1: Medium Priority - Core Feature Implementation
-
-*Building upon the new foundation to deliver major user-facing features.*
-
--   **[ ] Feature: Browser Extension v2 - Visual Capture**
-    -   **Goal:** Upgrade the browser extension to capture the page's favicon and a screenshot.
-    -   **Implementation:**
-        -   Use a content script to extract the favicon URL from the page's `<head>`.
-        -   Use the `chrome.tabs.captureVisibleTab` API to generate a screenshot.
-        -   Pass the URL, favicon, and screenshot data to the AI Navigator application when creating a new resource.
-
--   **[ ] UI/UX: Resource Detail View**
-    -   **Goal:** Create a dedicated, information-rich view for each resource.
-    -   **Implementation:**
-        -   Design a modal or a separate page that prominently displays the resource's `coverImageUrl`.
-        -   Clearly list all metadata (title, description, URL, category, priority, status, dates).
-        -   Integrate management of related links and attachments.
-        -   **New:** Add a "Notes" section allowing users to add custom Markdown-formatted comments to each resource.
-
--   **[ ] UI/UX: Gallery View v2 - Visual Showcase**
-    -   **Goal:** Transform the gallery view into a true visual-first browsing experience.
-    -   **Implementation:**
-        -   Update gallery cards to use the `coverImageUrl` as their primary visual element.
-        -   Implement a stylish default placeholder for resources that do not have a cover image.
-
----
-
-### 🟦 P2: Low Priority & Future Ideas
-
-*Long-term enhancements and "nice-to-have" features.*
-
--   **[ ] Feature: Settings Page v2 - Advanced Functionality**
-    -   **Goal:** Expand the Settings page into a central hub for application management.
-    -   **Implementation:**
-        -   **Data Management:** Add "Export to JSON" and "Import from JSON" for complete data backups (including attachments).
-        -   **Danger Zone:** Implement "Reset to Initial Data" and "Clear All Data" functions with robust confirmation dialogs.
-
--   **[ ] Architecture: Hierarchical Dictionaries**
-    -   **Goal:** Allow for more complex organization, such as nested categories.
-    -   **Implementation:** Add a `parentId` field to the `DictionaryItem` model to support tree-like structures.
-
--   **[ ] Intelligence: AI Auto-Tagging**
-    -   **Goal:** Leverage the Gemini API to further automate content organization.
-    -   **Implementation:** During the "AI Analyze" process, request 3-5 relevant keywords (tags) in addition to the existing metadata.
-
--   **[ ] Search: Enhanced Attachment Content Search**
-    -   **Goal:** Extend full-text search capabilities beyond `.txt` files.
-    -   **Implementation:** Investigate and integrate a client-side library (like `pdf.js`) to extract text content from uploaded PDF files.
+A major initiative to rebuild the UI based on modern, professional mockups.
 
 ---
 
 ## ✅ Completed Features
 
--   **Core: AI Classification:** Automatically analyze and classify URLs.
--   **Core: CRUD Operations:** Add, view, edit, and delete resources.
--   **UI: Multiple Views:** Switch between List and Gallery views.
--   **UI: Dynamic Dictionaries:** User-configurable categories, priorities, etc.
--   **Data: CSV Import/Export:** Portability for your resource list.
--   **UI: Batch Actions:** Update multiple items at once.
--   **UI: Search & Sort:** Full-text search and multiple sort options.
--   **Core: Relational Linking:** Connect related resources together.
--   **Core: File Attachments:** Attach files directly to resources.
--   **UI: Advanced Filtering:** Implemented combined filtering capabilities.
--   **UI: Theme Toggle:** Add a light/dark mode switcher.
--   **Technical: Migrate to IndexedDB:** Moved from localStorage to IndexedDB for more robust, scalable storage.
--   **Feature: Full-text search in attachments:** For supported file types (e.g., .txt), the content is indexed and searchable.
--   **UI: Onboarding / Walkthrough:** A simple guide for first-time users is now included.
--   **Feature: Browser Extension:** Created a simple browser extension to quickly add the current page to AI Navigator.
+- **Initial Scaffolding & Core UI:**
+  - [x] Basic app layout with React and Tailwind CSS.
+  - [x] IndexedDB setup for offline data persistence.
+- **Resource Management (CRUD):**
+  - [x] Add, edit, and delete web links.
+  - [x] List and Gallery views for browsing resources.
+- **AI-Powered Classification:**
+  - [x] Use Gemini API to auto-fill title, description, and category from a URL.
+  - [x] Companion browser extension for one-click resource saving.
+- **Advanced UI Features:**
+  - [x] Batch actions for updating multiple items.
+  - [x] Data import/export via CSV.
+  - [x] Onboarding guide for new users.
+- **Data Dictionaries:**
+  - [x] Settings page to manage custom categories, priorities, and statuses.
+  - [x] Refactored data model to use stable codes instead of labels.
+  - [x] Automatic data migration for existing users.
+- **Theme Enhancement:**
+  - [x] Theme switcher with Light, Dark, and System modes.
+  - [x] Auto-detection of system preference on first load.
+- **Project Nexus - Visual Upgrade:**
+  - [x] **Branding & Data Model:** Renamed to "AI Nexus" and extended `LinkItem` to support `coverImageUrl` and `faviconUrl`.
+  - [x] **Browser Extension v2:** Upgraded extension to capture screenshots and favicons.
+  - [x] **Visual Redesign:** Overhauled List and Gallery views with favicons, cover images, and modern "pill" styling for metadata.
+  - [x] **New Filtering System:** Implemented a persistent, multi-select filter panel for categories, priorities, and statuses.
+- **Resource Detail View:**
+  - [x] A modal to view all details of a single resource.
+  - [x] Display cover image, all metadata, related links, and attachments.
+  - [x] New **Markdown Notes** section for adding personal context.
+- **File Attachments:**
+  - [x] UI in the Add/Edit modal to upload a text-based file.
+  - [x] Logic to store the file's content with the resource.
+  - [x] **Searchable Content:** Main search bar also queries the full text of attached files.
+
+## 🎯 Next Up / In Progress
+
+- **Related Links:**
+  - [ ] A UI to add/remove/view links between related resources.
+  - [ ] Visualize these connections in the Resource Detail View.
+  - [ ] AI-powered suggestions for related links.
+
+## 📚 Backlog / Future Ideas
+
+- **Advanced Search:**
+  - [ ] Save common search queries and filter combinations.
+  - [ ] Search by date range (created, last updated).
+- **AI-Powered Insights:**
+  - [ ] Dashboard widget to show trending topics in your collection.
+  - [ ] AI-generated summaries for attached text files.
+- **Global Hotkeys:**
+  - [ ] Keyboard shortcuts for common actions (e.g., `Cmd+K` for search, `N` for new).
+- **Multi-Device Sync:**
+  - [ ] (Long-term) Explore options for syncing data between devices (e.g., using a cloud backend).
+- **Sharing & Collaboration:**
+  - [ ] (Long-term) Share a curated collection of resources with others.
+- **Tagging System:**
+  - [ ] Add a free-form tagging system in addition to the structured categories.

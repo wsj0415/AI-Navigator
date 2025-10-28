@@ -1,29 +1,9 @@
-export interface Attachment {
-  id: string;
-  name: string;
-  type: string;
-  size: number; // in bytes
-  dataUrl: string; // base64 encoded
-  textContent?: string; // Extracted text content for searching
-}
-
-export interface LinkItem {
-  id: string;
-  url: string;
-  title: string;
-  description: string;
-  topic: string; // The value from a DictionaryItem
-  priority: string; // The value from a DictionaryItem
-  status: string; // The value from a DictionaryItem
-  createdAt: string; // ISO date string
-  relatedLinkIds: string[]; // IDs of other linked items
-  attachments: Attachment[];
-  attachmentText?: string; // Aggregated text from attachments for searching
-}
-
 export interface DictionaryItem {
   id: string;
-  value: string;
+  code: string;
+  label: string;
+  sortOrder: number;
+  isEnabled: boolean;
 }
 
 export interface Dictionaries {
@@ -32,10 +12,28 @@ export interface Dictionaries {
   statuses: DictionaryItem[];
 }
 
-export type Page = 'dashboard' | 'resources' | 'settings';
+export interface LinkItem {
+  id: string;
+  url: string;
+  title: string;
+  description: string;
+  topic: string; 
+  priority: string;
+  status: string; 
+  createdAt: string; 
+  favicon?: string;
+  image?: string;
+  notes?: string;
+  fileAttachment?: {
+    name: string;
+    content: string;
+  };
+}
 
 export type ViewType = 'list' | 'gallery';
 
 export type SortOption = 'default' | 'priority' | 'title';
+
+export type Page = 'dashboard' | 'resources' | 'settings';
 
 export type ThemeSetting = 'light' | 'dark' | 'system';
