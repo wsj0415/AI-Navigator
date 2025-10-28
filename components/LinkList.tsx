@@ -1,5 +1,6 @@
 import React from 'react';
 import { LinkItem, Dictionaries } from '../types';
+// Fix: Use relative path for component imports.
 import { TrashIcon, EditIcon, ExternalLinkIcon } from './Icons';
 
 interface LinkListProps {

@@ -15,7 +15,7 @@ const toCsv = (headers: string[], data: any[][]): string => {
 };
 
 export const exportLinksToCsv = (links: LinkItem[], dictionaries: Dictionaries): void => {
-    const headers = ['id', 'url', 'title', 'description', 'topic', 'priority', 'status', 'createdAt', 'notes'];
+    const headers = ['id', 'url', 'title', 'description', 'topic', 'priority', 'status', 'createdAt', 'notes', 'relatedLinkIds'];
     
     const getLabelFromCode = (dict: keyof Dictionaries, code: string) => {
         return dictionaries[dict].find(item => item.code === code)?.label || code;
@@ -31,10 +31,11 @@ export const exportLinksToCsv = (links: LinkItem[], dictionaries: Dictionaries):
         getLabelFromCode('statuses', link.status),
         link.createdAt,
         link.notes || '',
+        link.relatedLinkIds?.join(';') || '',
     ]);
 
     const csvContent = toCsv(headers, data);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-t;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
@@ -74,6 +75,7 @@ export const importLinksFromCsv = (csvText: string, dictionaries: Dictionaries):
                     status: getCodeFromLabel('statuses', linkObject.status || 'To Read'),
                     createdAt: linkObject.createdAt || new Date().toISOString(),
                     notes: linkObject.notes || '',
+                    relatedLinkIds: linkObject.relatedLinkIds?.split(';').filter(id => id) || [],
                 };
             });
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DictionaryItem } from '../types';
+// Fix: Use relative path for component imports.
 import { PlusIcon, TrashIcon, EditIcon, CheckIcon, ArrowUpIcon, ArrowDownIcon } from './Icons';
 
 interface DictionaryManagerProps {

@@ -1,0 +1,120 @@
+:root {
+    --bg-light: #ffffff;
+    --text-light: #1f2937;
+    --border-light: #d1d5db;
+    --input-bg-light: #f9fafb;
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --secondary-bg-light: #f3f4f6;
+    --secondary-text-light: #4b5563;
+
+    --bg-dark: #121212;
+    --text-dark: #e0e0e0;
+    --border-dark: #444444;
+    --input-bg-dark: #2d2d2d;
+    --secondary-bg-dark: #1e1e1e;
+    --secondary-text-dark: #9ca3af;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    width: 350px;
+    font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: var(--bg-dark);
+        color: var(--text-dark);
+    }
+}
+
+.container {
+    padding: 16px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--secondary-text-light);
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    background-color: var(--input-bg-light);
+    color: var(--text-light);
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4);
+}
+
+.button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+}
+
+.button-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.button-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.button-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.loader, .success-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.loader p, .success-message p {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+    .form-label { color: var(--secondary-text-dark); }
+    .form-input { 
+        border-color: var(--border-dark); 
+        background-color: var(--input-bg-dark); 
+        color: var(--text-dark);
+    }
+}

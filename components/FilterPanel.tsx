@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dictionaries, DictionaryItem } from '../types';
+// Fix: Use relative path for component imports.
 import { ChevronDownIcon } from './Icons';
 
 interface FilterPanelProps {

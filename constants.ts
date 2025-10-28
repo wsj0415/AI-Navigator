@@ -32,6 +32,7 @@ export const INITIAL_LINKS: LinkItem[] = [
     priority: 'high',
     status: 'to-read',
     createdAt: new Date().toISOString(),
+    relatedLinkIds: [],
   },
   {
     id: crypto.randomUUID(),
@@ -42,6 +43,7 @@ export const INITIAL_LINKS: LinkItem[] = [
     priority: 'medium',
     status: 'in-progress',
     createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    relatedLinkIds: [],
   },
   {
     id: crypto.randomUUID(),
@@ -52,5 +54,6 @@ export const INITIAL_LINKS: LinkItem[] = [
     priority: 'high',
     status: 'completed',
     createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+    relatedLinkIds: [],
   },
 ];

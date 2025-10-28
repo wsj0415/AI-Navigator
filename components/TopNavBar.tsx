@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Page, ThemeSetting } from '../types';
+// Fix: Use relative path for component imports.
 import { LogoIcon, SearchIcon, PlusIcon, UploadIcon, DownloadIcon, SunIcon, MoonIcon, DesktopIcon } from './Icons';
 
 interface TopNavBarProps {
@@ -66,7 +67,7 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
                 </span>
                 <input
                   type="text"
-                  placeholder="Search resources..."
+                  placeholder='Search... (e.g., react topic:"Web Dev" in:notes)'
                   value={searchTerm}
                   onChange={(e) => onSearchChange(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 rounded-md bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary text-gray-800 dark:text-gray-200 text-sm"

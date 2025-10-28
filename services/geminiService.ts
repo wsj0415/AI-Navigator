@@ -1,8 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
+import { LinkItem } from "../types";
 
 export const summarizeUrl = async (url: string): Promise<{ title: string; description: string; topic: string }> => {
   try {
-    // FIX: Initialize GoogleGenAI with API key from environment variables as per guidelines.
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
     const prompt = `Based on the content found at the URL "${url}", provide:
@@ -15,7 +15,6 @@ Title: [The title]
 Description: [The description]
 Topic: [The category]`;
 
-    // FIX: Use generateContent with googleSearch tool for URL summarization, as models cannot directly access URLs.
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
@@ -24,7 +23,6 @@ Topic: [The category]`;
         },
     });
 
-    // FIX: Access generated text via the .text property on the response.
     const text = response.text.trim();
     let title = "Untitled";
     let description = "No description available.";
@@ -67,4 +65,65 @@ Topic: [The category]`;
       topic: "Other"
     };
   }
+};
+
+
+export const findRelatedLinks = async (sourceLink: LinkItem, candidateLinks: LinkItem[]): Promise<string[]> => {
+    if (candidateLinks.length === 0) return [];
+    
+    try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+        const sourceContent = `Title: ${sourceLink.title}\nDescription: ${sourceLink.description}\nNotes: ${sourceLink.notes || ''}`.trim();
+        
+        const candidates = candidateLinks.map(link => ({ id: link.id, title: link.title }));
+
+        const prompt = `
+            Analyze the Source Resource and determine which of the Candidate Resources are strongly related to it.
+            
+            Source Resource:
+            ---
+            ${sourceContent}
+            ---
+
+            Candidate Resources:
+            ---
+            ${JSON.stringify(candidates, null, 2)}
+            ---
+
+            Return a JSON object with a single key "relatedIds" which is an array of strings. Each string should be the ID of a strongly related candidate resource. Only include candidates that have a direct and significant connection. If no candidates are related, return an empty array.
+        `;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        relatedIds: {
+                            type: Type.ARRAY,
+                            items: {
+                                type: Type.STRING
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const jsonString = response.text.trim();
+        const result = JSON.parse(jsonString);
+
+        if (result && Array.isArray(result.relatedIds)) {
+            return result.relatedIds;
+        }
+
+        return [];
+
+    } catch (error) {
+        console.error("Error finding related links with Gemini:", error);
+        return [];
+    }
 };
