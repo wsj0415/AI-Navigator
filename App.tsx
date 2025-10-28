@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Page, LinkItem, Dictionaries, ViewType, SortOption } from './types';
+import { Page, LinkItem, Dictionaries, ViewType, SortOption, ThemeSetting } from './types';
 import useLocalStorage from './hooks/useLocalStorage';
 import { useAppStorage } from './hooks/useAppStorage';
 import { parseCSV, exportCSV } from './utils/csvHelper';
@@ -16,13 +16,32 @@ import OnboardingGuide from './components/OnboardingGuide';
 
 const App: React.FC = () => {
   const { isInitialized, links, setLinks, dictionaries, setDictionaries } = useAppStorage();
-  const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'dark');
+  const [theme, setTheme] = useLocalStorage<ThemeSetting>('theme', 'system');
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useLocalStorage('onboarding-completed', false);
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove(theme === 'dark' ? 'light' : 'dark');
-    root.classList.add(theme);
+    const applyTheme = (effectiveTheme: 'light' | 'dark') => {
+      const root = window.document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(effectiveTheme);
+    };
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleSystemThemeChange = () => {
+      if (theme === 'system') {
+        applyTheme(mediaQuery.matches ? 'dark' : 'light');
+      }
+    };
+
+    if (theme === 'light' || theme === 'dark') {
+      applyTheme(theme);
+    } else {
+      handleSystemThemeChange(); // Apply initial system theme
+    }
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
   }, [theme]);
   
   const [page, setPage] = useState<Page>('resources');

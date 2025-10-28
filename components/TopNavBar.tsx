@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { Page } from '../types';
-import { LogoIcon, SearchIcon, PlusIcon, UploadIcon, DownloadIcon, SunIcon, MoonIcon } from './Icons';
+import { Page, ThemeSetting } from '../types';
+import { LogoIcon, SearchIcon, PlusIcon, UploadIcon, DownloadIcon, SunIcon, MoonIcon, DesktopIcon } from './Icons';
 
 interface TopNavBarProps {
   page: Page;
@@ -10,8 +10,8 @@ interface TopNavBarProps {
   onAddNew: () => void;
   onExport: () => void;
   onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  theme: 'light' | 'dark';
-  onThemeChange: (theme: 'light' | 'dark') => void;
+  theme: ThemeSetting;
+  onThemeChange: (theme: ThemeSetting) => void;
 }
 
 const TopNavBar: React.FC<TopNavBarProps> = ({
@@ -29,10 +29,6 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
-  };
-  
-  const toggleTheme = () => {
-    onThemeChange(theme === 'dark' ? 'light' : 'dark');
   };
 
   const NavButton: React.FC<{ targetPage: Page; children: React.ReactNode }> = ({ targetPage, children }) => (
@@ -79,9 +75,29 @@ const TopNavBar: React.FC<TopNavBarProps> = ({
             )}
             
             <div className="flex items-center gap-2">
-              <button onClick={toggleTheme} title="Toggle Theme" className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-white transition-colors">
-                {theme === 'dark' ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
-              </button>
+               <div className="flex items-center bg-gray-200 dark:bg-gray-800 rounded-md p-1">
+                  <button
+                    onClick={() => onThemeChange('light')}
+                    title="Light Mode"
+                    className={`p-2 rounded ${theme === 'light' ? 'bg-primary text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
+                  >
+                    <SunIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onThemeChange('system')}
+                    title="System Default"
+                    className={`p-2 rounded ${theme === 'system' ? 'bg-primary text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
+                  >
+                    <DesktopIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onThemeChange('dark')}
+                    title="Dark Mode"
+                    className={`p-2 rounded ${theme === 'dark' ? 'bg-primary text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700'}`}
+                  >
+                    <MoonIcon className="w-5 h-5" />
+                  </button>
+                </div>
               <input type="file" ref={fileInputRef} onChange={onImport} className="hidden" accept=".csv" />
               <button onClick={handleImportClick} title="Import CSV" className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-white transition-colors">
                 <UploadIcon className="w-5 h-5" />

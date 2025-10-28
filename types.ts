@@ -37,3 +37,5 @@ export type Page = 'dashboard' | 'resources' | 'settings';
 export type ViewType = 'list' | 'gallery';
 
 export type SortOption = 'default' | 'priority' | 'title';
+
+export type ThemeSetting = 'light' | 'dark' | 'system';
